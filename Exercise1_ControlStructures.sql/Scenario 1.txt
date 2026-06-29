@@ -1,0 +1,33 @@
+SET SERVEROUTPUT ON;
+
+BEGIN
+    FOR customer_record IN
+    (
+        SELECT c.CustomerID,
+               c.DOB,
+               l.LoanID
+        FROM Customers c
+        JOIN Loans l
+        ON c.CustomerID = l.CustomerID
+    )
+    LOOP
+
+        IF FLOOR(MONTHS_BETWEEN(SYSDATE,
+                                customer_record.DOB)/12) > 60 THEN
+
+            UPDATE Loans
+            SET InterestRate = InterestRate - 1
+            WHERE LoanID = customer_record.LoanID;
+
+            DBMS_OUTPUT.PUT_LINE(
+                'Discount applied to Customer ID '
+                || customer_record.CustomerID
+            );
+
+        END IF;
+
+    END LOOP;
+
+    COMMIT;
+END;
+/
